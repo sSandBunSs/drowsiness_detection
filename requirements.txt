@@ -1,0 +1,16 @@
+# =============================================
+#  requirements.txt — Drowsiness Detection
+#  Kompatibel: Windows 10 & Raspberry Pi 4
+# =============================================
+
+# Core
+opencv-python>=4.8.0
+mediapipe>=0.10.0
+numpy>=1.24.0
+
+# Audio (Linux/RPi — opsional, fallback ke aplay)
+# pyaudio>=0.2.13   # install manual jika diperlukan
+
+# Visualisasi & analisis (opsional, untuk notebook analisis)
+matplotlib>=3.7.0
+pandas>=2.0.0
