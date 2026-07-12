@@ -9,11 +9,13 @@ from datetime import datetime
 
 
 class MetricsLogger:
-    def __init__(self, output_dir="logs"):
+    def __init__(self, output_dir="logs", platform="", lighting_condition=""):
         os.makedirs(output_dir, exist_ok=True)
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.csv_path = os.path.join(output_dir, f"metrics_{ts}.csv")
         self.event_path = os.path.join(output_dir, f"events_{ts}.csv")
+        self.platform = platform
+        self.lighting_condition = lighting_condition
 
         # Inisialisasi CSV metrics
         with open(self.csv_path, "w", newline="") as f:
@@ -22,7 +24,8 @@ class MetricsLogger:
                 "timestamp", "elapsed_sec",
                 "ear_left", "ear_right", "ear_avg",
                 "mar", "perclos", "status",
-                "ear_counter", "mar_counter"
+                "ear_counter", "mar_counter",
+                "platform", "lighting_condition"
             ])
 
         # Inisialisasi CSV events
@@ -43,7 +46,8 @@ class MetricsLogger:
                 ts, elapsed,
                 round(ear_l, 4), round(ear_r, 4), ear_avg,
                 round(mar, 4), round(perclos, 4),
-                status, ear_counter, mar_counter
+                status, ear_counter, mar_counter,
+                self.platform, self.lighting_condition
             ])
 
     def log_event(self, event_type: str, value: str = ""):

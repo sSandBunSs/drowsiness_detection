@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+
+# Large local-only dataset (not part of the repo checkout, see CLAUDE.md)
+datasets/
+
+# Downloaded reference papers / campus docs / brainstorm notes (not authored work)
+journal/
+first_brainstorm.pdf
+PEDOMAN TA FTII 2022 v1.1.pdf
+*.Zone.Identifier

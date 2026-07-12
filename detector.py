@@ -25,6 +25,8 @@ from dataclasses import dataclass, field
 from typing import Optional, Tuple
 from datetime import datetime
 
+from metrics_logger import MetricsLogger
+
 # ─── Logging Setup ─────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
@@ -71,6 +73,10 @@ class Config:
     show_fps: bool = True
     record_video: bool = False
     output_video_path: str = "logs/recorded_session.avi"
+
+    # Logging penelitian
+    log_metrics: bool = True                    # simpan CSV EAR/MAR/PERCLOS per-frame
+    lighting_condition: str = "unspecified"      # set manual per sesi uji: "siang" / "malam"
 
     # Platform
     is_raspberry_pi: bool = field(default_factory=lambda: Config._detect_rpi())
@@ -320,6 +326,12 @@ class DrowsinessDetector:
         self.alarm = AlarmSystem(self.config)
         self.viz = Visualizer()
 
+        self.metrics: Optional[MetricsLogger] = None
+        if self.config.log_metrics:
+            platform_name = "Raspberry Pi" if self.config.is_raspberry_pi else platform.system()
+            self.metrics = MetricsLogger(platform=platform_name,
+                                          lighting_condition=self.config.lighting_condition)
+
         # MediaPipe setup (Tasks API — kompatibel mediapipe >= 0.10)
         model_path = self._download_model()
         options = FaceLandmarkerOptions(
@@ -354,22 +366,26 @@ class DrowsinessDetector:
             print(f"✅ Model tersimpan di: {model_path}")
         return model_path
 
-    # ── Kamera ───────────────────────────────────────────────
-    def _init_camera(self) -> bool:
-        backend = cv2.CAP_V4L2 if self.config.is_raspberry_pi else cv2.CAP_ANY
-        self.cap = cv2.VideoCapture(self.config.camera_index, backend)
+    # ── Kamera / File Video ───────────────────────────────────
+    def _init_camera(self, video_source: Optional[str] = None) -> bool:
+        if video_source:
+            # Sumber dari file video (misal dataset YawDD/UTA-RLDD)
+            self.cap = cv2.VideoCapture(video_source)
+        else:
+            backend = cv2.CAP_V4L2 if self.config.is_raspberry_pi else cv2.CAP_ANY
+            self.cap = cv2.VideoCapture(self.config.camera_index, backend)
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH,  self.config.frame_width)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.config.frame_height)
+            self.cap.set(cv2.CAP_PROP_FPS,          self.config.fps_target)
+            # Raspberry Pi: turunkan buffer agar latency kecil
+            if self.config.is_raspberry_pi:
+                self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+
         if not self.cap.isOpened():
-            logger.error(f"Kamera index {self.config.camera_index} tidak bisa dibuka.")
+            logger.error(f"Sumber video tidak bisa dibuka: {video_source or self.config.camera_index}")
             return False
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH,  self.config.frame_width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.config.frame_height)
-        self.cap.set(cv2.CAP_PROP_FPS,          self.config.fps_target)
 
-        # Raspberry Pi: turunkan buffer agar latency kecil
-        if self.config.is_raspberry_pi:
-            self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-
-        logger.info(f"Kamera berhasil dibuka: {self.config.frame_width}x{self.config.frame_height}")
+        logger.info(f"Sumber video dibuka: {video_source or self.config.camera_index}")
         return True
 
     def _init_writer(self, w, h):
@@ -392,6 +408,11 @@ class DrowsinessDetector:
             self.state.calibrated = True
             logger.info(f"Kalibrasi selesai. Baseline EAR={baseline:.3f}, "
                         f"Threshold={self.state.ear_threshold_adaptive:.3f}")
+            if self.metrics:
+                self.metrics.log_event(
+                    "CALIBRATED",
+                    f"baseline={baseline:.3f} threshold={self.state.ear_threshold_adaptive:.3f}"
+                )
 
     # ── Update FPS ────────────────────────────────────────────
     def _update_fps(self):
@@ -449,6 +470,10 @@ class DrowsinessDetector:
                     self.state.drowsy_count += 1
                     logger.warning(f"Kantuk terdeteksi! EAR={ear:.3f} "
                                    f"selama {self.state.ear_counter} frame")
+                    if self.metrics:
+                        self.metrics.log_event(
+                            "DROWSY", f"EAR={ear:.3f} frames={self.state.ear_counter}"
+                        )
                 self.state.ear_counter = 0
 
             # ── Logika MAR (menguap) ──
@@ -458,6 +483,8 @@ class DrowsinessDetector:
                 if self.state.mar_counter >= self.config.mar_consec_frames:
                     self.state.yawn_count += 1
                     logger.info(f"Menguap terdeteksi! MAR={mar:.3f}")
+                    if self.metrics:
+                        self.metrics.log_event("YAWN", f"MAR={mar:.3f}")
                 self.state.mar_counter = 0
 
             # ── Tentukan Status ──
@@ -471,6 +498,11 @@ class DrowsinessDetector:
                 self.state.status = "WARNING"
             else:
                 self.state.status = "NORMAL"
+
+            if self.metrics:
+                self.metrics.log_frame(ear_left, ear_right, mar, perclos,
+                                        self.state.status, self.state.ear_counter,
+                                        self.state.mar_counter)
 
             # ── Alarm ──
             now = time.time()
@@ -505,9 +537,9 @@ class DrowsinessDetector:
         return frame
 
     # ── Loop Utama ────────────────────────────────────────────
-    def run(self):
+    def run(self, video_source: Optional[str] = None):
         os.makedirs("logs", exist_ok=True)
-        if not self._init_camera():
+        if not self._init_camera(video_source):
             return
 
         ret, first = self.cap.read()
@@ -531,11 +563,15 @@ class DrowsinessDetector:
         while True:
             ret, frame = self.cap.read()
             if not ret:
-                logger.error("Frame tidak terbaca dari kamera.")
+                if video_source:
+                    logger.info("Video selesai diputar.")
+                else:
+                    logger.error("Frame tidak terbaca dari kamera.")
                 break
 
-            # Flip horizontal (mirror)
-            frame = cv2.flip(frame, 1)
+            # Flip horizontal (mirror) — hanya untuk kamera live, bukan file video
+            if not video_source:
+                frame = cv2.flip(frame, 1)
             self._update_fps()
 
             # Proses & tampilkan
@@ -581,6 +617,11 @@ class DrowsinessDetector:
 
 # ─── Entry Point ───────────────────────────────────────────
 if __name__ == "__main__":
+    import sys
+    # Uji dataset: python detector.py path/ke/video.mp4
+    # Kamera live (default): python detector.py
+    video_path = sys.argv[1] if len(sys.argv) > 1 else None
+
     cfg = Config(
         camera_index=0,
         frame_width=640,
@@ -591,6 +632,8 @@ if __name__ == "__main__":
         alarm_enabled=True,
         show_fps=True,
         record_video=False,
+        log_metrics=True,
+        lighting_condition="unspecified",  # ganti manual: "siang" / "malam" per sesi uji
     )
     detector = DrowsinessDetector(config=cfg)
-    detector.run()
+    detector.run(video_source=video_path)
