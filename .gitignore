@@ -9,3 +9,6 @@ journal/
 first_brainstorm.pdf
 PEDOMAN TA FTII 2022 v1.1.pdf
 *.Zone.Identifier
+
+# Local GL library shims for headless MediaPipe (sandbox-only, see CLAUDE.md)
+libs/

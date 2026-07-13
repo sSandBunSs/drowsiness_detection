@@ -87,3 +87,172 @@
 2026-04-20 18:44:28,095 [WARNING] Kantuk terdeteksi! EAR=0.200 selama 20 frame
 2026-04-20 18:44:28,448 [INFO] Keluar dari program.
 2026-04-20 18:44:29,625 [INFO] Resource dibebaskan. Program selesai.
+2026-07-12 23:03:40,469 [INFO] AlarmSystem initialized on Linux
+2026-07-12 23:07:18,883 [INFO] AlarmSystem initialized on Linux
+2026-07-13 09:20:59,096 [INFO] AlarmSystem initialized on Linux
+2026-07-13 09:21:44,870 [INFO] AlarmSystem initialized on Linux
+2026-07-13 09:21:44,957 [INFO] DrowsinessDetector siap.
+2026-07-13 09:21:44,958 [INFO] Platform: Linux
+2026-07-13 09:21:45,063 [INFO] Sumber video dibuka: 0
+2026-07-13 09:49:48,733 [INFO] AlarmSystem initialized on Linux
+2026-07-13 09:49:48,875 [INFO] DrowsinessDetector siap.
+2026-07-13 09:49:48,875 [INFO] Platform: Linux
+2026-07-13 09:49:48,968 [INFO] Sumber video dibuka: 0
+2026-07-13 09:49:49,389 [INFO] Sistem berjalan. Tekan 'q' untuk keluar, 'r' reset counter, 's' screenshot, 'l' toggle landmarks
+2026-07-13 09:49:50,851 [INFO] Keluar dari program.
+2026-07-13 09:49:50,960 [INFO] Resource dibebaskan. Program selesai.
+2026-07-13 20:23:18,941 [INFO] AlarmSystem initialized on Linux
+2026-07-13 22:42:58,664 [INFO] AlarmSystem initialized on Windows
+2026-07-13 22:42:59,816 [INFO] DrowsinessDetector siap.
+2026-07-13 22:42:59,817 [INFO] Platform: Windows
+2026-07-13 22:43:00,016 [ERROR] Sumber video tidak bisa dibuka: 0
+2026-07-13 22:49:11,466 [INFO] AlarmSystem initialized on Windows
+2026-07-13 22:49:11,541 [INFO] DrowsinessDetector siap.
+2026-07-13 22:49:11,542 [INFO] Platform: Windows
+2026-07-13 22:49:13,424 [INFO] Sumber video dibuka: 0
+2026-07-13 22:49:13,805 [INFO] Sistem berjalan. Tekan 'q' untuk keluar, 'r' reset counter, 's' screenshot, 'l' toggle landmarks
+2026-07-13 22:49:18,396 [INFO] Kalibrasi selesai. Baseline EAR=0.278, Threshold=0.208
+2026-07-13 22:49:21,663 [WARNING] Kantuk terdeteksi! EAR=0.259 selama 42 frame
+2026-07-13 22:49:57,532 [WARNING] Kantuk terdeteksi! EAR=0.267 selama 38 frame
+2026-07-13 22:50:10,949 [WARNING] Kantuk terdeteksi! EAR=0.215 selama 41 frame
+2026-07-13 22:50:19,068 [WARNING] Kantuk terdeteksi! EAR=0.209 selama 39 frame
+2026-07-13 22:50:22,268 [WARNING] Kantuk terdeteksi! EAR=0.287 selama 69 frame
+2026-07-13 22:50:26,515 [WARNING] Kantuk terdeteksi! EAR=0.217 selama 105 frame
+2026-07-13 22:50:28,668 [WARNING] Kantuk terdeteksi! EAR=0.214 selama 34 frame
+2026-07-13 22:50:43,468 [WARNING] Kantuk terdeteksi! EAR=0.239 selama 109 frame
+2026-07-13 22:50:54,879 [WARNING] Kantuk terdeteksi! EAR=0.240 selama 101 frame
+2026-07-13 22:51:05,170 [WARNING] Kantuk terdeteksi! EAR=0.215 selama 22 frame
+2026-07-13 22:51:18,375 [WARNING] Kantuk terdeteksi! EAR=0.242 selama 40 frame
+2026-07-13 22:51:23,976 [WARNING] Kantuk terdeteksi! EAR=0.230 selama 63 frame
+2026-07-13 22:51:25,937 [WARNING] Kantuk terdeteksi! EAR=0.208 selama 20 frame
+2026-07-13 22:51:28,681 [WARNING] Kantuk terdeteksi! EAR=0.241 selama 33 frame
+2026-07-13 22:51:46,169 [WARNING] Kantuk terdeteksi! EAR=0.213 selama 58 frame
+2026-07-13 22:53:01,333 [INFO] AlarmSystem initialized on Windows
+2026-07-13 22:53:01,406 [INFO] DrowsinessDetector siap.
+2026-07-13 22:53:01,407 [INFO] Platform: Windows
+2026-07-13 22:53:03,192 [INFO] Sumber video dibuka: 0
+2026-07-13 22:53:03,452 [INFO] Sistem berjalan. Tekan 'q' untuk keluar, 'r' reset counter, 's' screenshot, 'l' toggle landmarks
+2026-07-13 22:53:06,855 [INFO] Kalibrasi selesai. Baseline EAR=0.319, Threshold=0.239
+2026-07-13 22:53:12,781 [WARNING] Kantuk terdeteksi! EAR=0.242 selama 121 frame
+2026-07-13 22:53:40,017 [WARNING] Kantuk terdeteksi! EAR=0.247 selama 35 frame
+2026-07-13 22:53:45,747 [WARNING] Kantuk terdeteksi! EAR=0.256 selama 97 frame
+2026-07-13 22:53:47,186 [WARNING] Kantuk terdeteksi! EAR=0.317 selama 39 frame
+2026-07-13 22:53:50,322 [WARNING] Kantuk terdeteksi! EAR=0.263 selama 85 frame
+2026-07-13 22:53:52,503 [WARNING] Kantuk terdeteksi! EAR=0.241 selama 25 frame
+2026-07-13 22:53:54,785 [WARNING] Kantuk terdeteksi! EAR=0.274 selama 60 frame
+2026-07-13 22:53:57,588 [WARNING] Kantuk terdeteksi! EAR=0.279 selama 57 frame
+2026-07-13 22:54:02,683 [WARNING] Kantuk terdeteksi! EAR=0.257 selama 62 frame
+2026-07-13 22:54:04,800 [WARNING] Kantuk terdeteksi! EAR=0.273 selama 23 frame
+2026-07-13 22:54:08,078 [WARNING] Kantuk terdeteksi! EAR=0.262 selama 20 frame
+2026-07-13 22:54:10,251 [WARNING] Kantuk terdeteksi! EAR=0.264 selama 48 frame
+2026-07-13 22:54:14,874 [WARNING] Kantuk terdeteksi! EAR=0.244 selama 64 frame
+2026-07-13 22:54:16,129 [WARNING] Kantuk terdeteksi! EAR=0.274 selama 37 frame
+2026-07-13 22:54:20,012 [WARNING] Kantuk terdeteksi! EAR=0.239 selama 111 frame
+2026-07-13 22:54:20,994 [WARNING] Kantuk terdeteksi! EAR=0.256 selama 29 frame
+2026-07-13 22:54:41,334 [INFO] Menguap terdeteksi! MAR=0.648
+2026-07-13 22:54:45,164 [WARNING] Kantuk terdeteksi! EAR=0.239 selama 637 frame
+2026-07-13 22:54:46,161 [INFO] Menguap terdeteksi! MAR=0.640
+2026-07-13 22:54:46,534 [WARNING] Kantuk terdeteksi! EAR=0.253 selama 33 frame
+2026-07-13 22:55:18,033 [WARNING] Kantuk terdeteksi! EAR=0.256 selama 21 frame
+2026-07-13 22:55:23,535 [INFO] Menguap terdeteksi! MAR=0.649
+2026-07-13 22:55:26,924 [INFO] Menguap terdeteksi! MAR=0.584
+2026-07-13 22:55:28,394 [WARNING] Kantuk terdeteksi! EAR=0.266 selama 241 frame
+2026-07-13 22:55:50,833 [INFO] Menguap terdeteksi! MAR=0.634
+2026-07-13 22:55:51,973 [INFO] Menguap terdeteksi! MAR=0.623
+2026-07-13 22:55:53,406 [WARNING] Kantuk terdeteksi! EAR=0.265 selama 44 frame
+2026-07-13 22:55:54,267 [INFO] Menguap terdeteksi! MAR=0.619
+2026-07-13 22:55:59,341 [WARNING] Kantuk terdeteksi! EAR=0.257 selama 121 frame
+2026-07-13 22:56:08,271 [WARNING] Kantuk terdeteksi! EAR=0.239 selama 242 frame
+2026-07-13 22:56:23,960 [WARNING] Kantuk terdeteksi! EAR=0.265 selama 33 frame
+2026-07-13 22:56:27,312 [WARNING] Kantuk terdeteksi! EAR=0.252 selama 63 frame
+2026-07-13 22:56:51,564 [WARNING] Kantuk terdeteksi! EAR=0.317 selama 54 frame
+2026-07-13 22:57:01,581 [WARNING] Kantuk terdeteksi! EAR=0.246 selama 54 frame
+2026-07-13 22:57:09,416 [WARNING] Kantuk terdeteksi! EAR=0.274 selama 204 frame
+2026-07-13 22:57:10,799 [WARNING] Kantuk terdeteksi! EAR=0.256 selama 21 frame
+2026-07-13 22:57:12,492 [WARNING] Kantuk terdeteksi! EAR=0.264 selama 24 frame
+2026-07-13 22:57:14,474 [WARNING] Kantuk terdeteksi! EAR=0.251 selama 34 frame
+2026-07-13 22:57:26,239 [WARNING] Kantuk terdeteksi! EAR=0.255 selama 57 frame
+2026-07-13 22:57:31,836 [WARNING] Kantuk terdeteksi! EAR=0.277 selama 21 frame
+2026-07-13 22:57:43,151 [WARNING] Kantuk terdeteksi! EAR=0.261 selama 33 frame
+2026-07-13 22:57:48,459 [INFO] Menguap terdeteksi! MAR=0.633
+2026-07-13 22:57:50,421 [WARNING] Kantuk terdeteksi! EAR=0.241 selama 47 frame
+2026-07-13 22:57:52,476 [WARNING] Kantuk terdeteksi! EAR=0.254 selama 33 frame
+2026-07-13 22:57:55,870 [WARNING] Kantuk terdeteksi! EAR=0.241 selama 86 frame
+2026-07-13 22:57:56,572 [INFO] Menguap terdeteksi! MAR=0.500
+2026-07-13 22:57:57,582 [WARNING] Kantuk terdeteksi! EAR=0.263 selama 36 frame
+2026-07-13 22:58:08,031 [WARNING] Kantuk terdeteksi! EAR=0.306 selama 71 frame
+2026-07-13 22:58:10,402 [WARNING] Kantuk terdeteksi! EAR=0.250 selama 37 frame
+2026-07-13 22:58:13,631 [INFO] Menguap terdeteksi! MAR=0.593
+2026-07-13 22:58:18,127 [WARNING] Kantuk terdeteksi! EAR=0.256 selama 179 frame
+2026-07-13 22:58:29,172 [INFO] Menguap terdeteksi! MAR=0.545
+2026-07-13 22:58:30,306 [WARNING] Kantuk terdeteksi! EAR=0.241 selama 73 frame
+2026-07-13 22:58:31,169 [WARNING] Kantuk terdeteksi! EAR=0.315 selama 22 frame
+2026-07-13 22:58:33,038 [WARNING] Kantuk terdeteksi! EAR=0.244 selama 20 frame
+2026-07-13 22:58:42,829 [WARNING] Kantuk terdeteksi! EAR=0.266 selama 46 frame
+2026-07-13 22:58:43,568 [WARNING] Kantuk terdeteksi! EAR=0.279 selama 20 frame
+2026-07-13 22:58:50,271 [WARNING] Kantuk terdeteksi! EAR=0.248 selama 73 frame
+2026-07-13 22:58:58,382 [WARNING] Kantuk terdeteksi! EAR=0.258 selama 20 frame
+2026-07-13 22:59:02,385 [WARNING] Kantuk terdeteksi! EAR=0.251 selama 20 frame
+2026-07-13 22:59:09,684 [WARNING] Kantuk terdeteksi! EAR=0.257 selama 51 frame
+2026-07-13 22:59:14,703 [WARNING] Kantuk terdeteksi! EAR=0.259 selama 43 frame
+2026-07-13 22:59:16,643 [WARNING] Kantuk terdeteksi! EAR=0.266 selama 35 frame
+2026-07-13 23:05:27,241 [INFO] AlarmSystem initialized on Windows
+2026-07-13 23:05:27,320 [INFO] DrowsinessDetector siap.
+2026-07-13 23:05:27,321 [INFO] Platform: Windows
+2026-07-13 23:05:29,301 [INFO] Sumber video dibuka: 0
+2026-07-13 23:05:29,641 [INFO] Sistem berjalan. Tekan 'q' untuk keluar, 'r' reset counter, 's' screenshot, 'l' toggle landmarks
+2026-07-13 23:05:33,131 [INFO] Kalibrasi selesai. Baseline EAR=0.401, Threshold=0.301
+2026-07-13 23:07:35,006 [WARNING] Kantuk terdeteksi! EAR=0.302 selama 28 frame
+2026-07-13 23:07:37,102 [WARNING] Kantuk terdeteksi! EAR=0.304 selama 31 frame
+2026-07-13 23:07:44,713 [WARNING] Kantuk terdeteksi! EAR=0.308 selama 23 frame
+2026-07-13 23:07:53,540 [WARNING] Kantuk terdeteksi! EAR=0.303 selama 20 frame
+2026-07-13 23:07:56,794 [WARNING] Kantuk terdeteksi! EAR=0.310 selama 44 frame
+2026-07-13 23:08:13,427 [WARNING] Kantuk terdeteksi! EAR=0.308 selama 30 frame
+2026-07-13 23:08:14,574 [WARNING] Kantuk terdeteksi! EAR=0.302 selama 25 frame
+2026-07-13 23:08:25,897 [WARNING] Kantuk terdeteksi! EAR=0.343 selama 26 frame
+2026-07-13 23:08:30,353 [WARNING] Kantuk terdeteksi! EAR=0.342 selama 50 frame
+2026-07-13 23:08:43,553 [INFO] Menguap terdeteksi! MAR=0.642
+2026-07-13 23:08:45,087 [WARNING] Kantuk terdeteksi! EAR=0.321 selama 238 frame
+2026-07-13 23:08:50,940 [WARNING] Kantuk terdeteksi! EAR=0.314 selama 28 frame
+2026-07-13 23:08:50,971 [INFO] Menguap terdeteksi! MAR=0.606
+2026-07-13 23:08:57,112 [INFO] Menguap terdeteksi! MAR=0.570
+2026-07-13 23:09:00,351 [INFO] Menguap terdeteksi! MAR=0.603
+2026-07-13 23:09:01,885 [WARNING] Kantuk terdeteksi! EAR=0.328 selama 50 frame
+2026-07-13 23:09:08,588 [INFO] Menguap terdeteksi! MAR=0.634
+2026-07-13 23:09:09,908 [WARNING] Kantuk terdeteksi! EAR=0.304 selama 136 frame
+2026-07-13 23:09:11,488 [WARNING] Kantuk terdeteksi! EAR=0.310 selama 40 frame
+2026-07-13 23:09:13,578 [WARNING] Kantuk terdeteksi! EAR=0.302 selama 24 frame
+2026-07-13 23:09:14,957 [WARNING] Kantuk terdeteksi! EAR=0.325 selama 40 frame
+2026-07-13 23:09:20,931 [WARNING] Kantuk terdeteksi! EAR=0.301 selama 33 frame
+2026-07-13 23:09:21,918 [WARNING] Kantuk terdeteksi! EAR=0.305 selama 27 frame
+2026-07-13 23:09:22,861 [WARNING] Kantuk terdeteksi! EAR=0.306 selama 27 frame
+2026-07-13 23:09:31,884 [WARNING] Kantuk terdeteksi! EAR=0.317 selama 21 frame
+2026-07-13 23:10:02,221 [WARNING] Kantuk terdeteksi! EAR=0.328 selama 26 frame
+2026-07-13 23:10:24,157 [WARNING] Kantuk terdeteksi! EAR=0.307 selama 22 frame
+2026-07-13 23:18:46,820 [INFO] AlarmSystem initialized on Windows
+2026-07-13 23:18:46,902 [INFO] DrowsinessDetector siap.
+2026-07-13 23:18:46,903 [INFO] Platform: Windows
+2026-07-13 23:18:48,980 [INFO] Sumber video dibuka: 0
+2026-07-13 23:18:49,240 [INFO] Sistem berjalan. Tekan 'q' untuk keluar, 'r' reset counter, 's' screenshot, 'l' toggle landmarks
+2026-07-13 23:18:53,518 [INFO] Kalibrasi selesai. Baseline EAR=0.335, Threshold=0.251
+2026-07-13 23:18:55,199 [WARNING] Kantuk terdeteksi! EAR=0.307 selama 21 frame
+2026-07-13 23:20:11,000 [WARNING] Kantuk terdeteksi! EAR=0.292 selama 41 frame
+2026-07-13 23:20:14,527 [WARNING] Kantuk terdeteksi! EAR=0.276 selama 43 frame
+2026-07-13 23:20:20,435 [WARNING] Kantuk terdeteksi! EAR=0.295 selama 36 frame
+2026-07-13 23:20:36,247 [WARNING] Kantuk terdeteksi! EAR=0.264 selama 24 frame
+2026-07-13 23:20:43,159 [WARNING] Kantuk terdeteksi! EAR=0.343 selama 24 frame
+2026-07-13 23:21:12,721 [INFO] Menguap terdeteksi! MAR=0.576
+2026-07-13 23:21:12,849 [WARNING] Kantuk terdeteksi! EAR=0.260 selama 34 frame
+2026-07-13 23:21:16,759 [INFO] Menguap terdeteksi! MAR=0.634
+2026-07-13 23:21:17,822 [WARNING] Kantuk terdeteksi! EAR=0.353 selama 75 frame
+2026-07-13 23:21:20,727 [WARNING] Kantuk terdeteksi! EAR=0.270 selama 48 frame
+2026-07-13 23:21:32,178 [WARNING] Kantuk terdeteksi! EAR=0.251 selama 35 frame
+2026-07-13 23:21:32,744 [INFO] Menguap terdeteksi! MAR=0.650
+2026-07-13 23:21:35,377 [WARNING] Kantuk terdeteksi! EAR=0.255 selama 94 frame
+2026-07-13 23:21:40,290 [WARNING] Kantuk terdeteksi! EAR=0.252 selama 21 frame
+2026-07-13 23:21:43,464 [INFO] Menguap terdeteksi! MAR=0.590
+2026-07-13 23:21:43,489 [WARNING] Kantuk terdeteksi! EAR=0.261 selama 25 frame
+2026-07-13 23:21:44,966 [WARNING] Kantuk terdeteksi! EAR=0.266 selama 23 frame
+2026-07-13 23:21:51,722 [INFO] Menguap terdeteksi! MAR=0.638
+2026-07-13 23:21:54,522 [INFO] Menguap terdeteksi! MAR=0.617
+2026-07-13 23:23:10,621 [WARNING] Kantuk terdeteksi! EAR=0.303 selama 38 frame
