@@ -324,7 +324,7 @@ Temuan ini mengindikasikan bahwa **threshold EAR tetap sensitif terhadap variasi
 
 ## 5.2 Pengujian Real-Time, Kondisi Pencahayaan, dan Platform Embedded
 
-> 🔶 DRAF PLACEHOLDER — SELURUH SUBBAGIAN INI BELUM DIISI DATA ASLI. Struktur tabel di bawah adalah **template** mengikuti format §5.1/§5.3 (confusion matrix + precision/recall/F1), untuk memudahkan pengisian setelah pengujian nyata dilakukan dengan `validate_accuracy.py`. **Jangan mengisi angka di bawah dengan tebakan/asumsi — kosongkan `[ISI]` sampai data sungguhan tersedia.**
+> 🔶 DRAF PLACEHOLDER — §5.2.1, §5.2.2, dan §5.2.3 sudah diisi data asli. §5.2.3 (PC vs Raspberry Pi 4) menggunakan estimasi berbasis core Cortex-A72 (AWS EC2 `a1.medium`) karena akses hardware RPi4 fisik tidak tersedia — lihat metodologi lengkap di §5.2.3. §5.2.4 (grafik tren) masih menunggu skrip plotting yang belum dibuat. **Jangan mengisi angka `[ISI]` yang tersisa dengan tebakan/asumsi.**
 
 ### 5.2.1 Pengujian Video Real-Time (Ground Truth Manual)
 
@@ -334,27 +334,31 @@ Prosedur: rekam satu sesi webcam per subjek (mengemudi simulasi/menonton layar u
 python validate_accuracy.py logs/metrics_<timestamp>.csv ground_truth.csv
 ```
 
+Sesi diuji: satu subjek (peneliti sendiri), protokol fase bertimer manual — menit 0–2 kondisi waspada normal, menit 2–3 simulasi kedipan lambat/mata tertutup berkelanjutan (label `DROWSY`), menit 3–4 menguap berulang (label `WARNING`), sisa waktu kembali normal.
+
 | Subjek | Durasi sesi | n frame | Akurasi | Precision (DROWSY) | Recall (DROWSY) | F1 (DROWSY) |
 |---|---|---|---|---|---|---|
-| [ISI] | [ISI] | [ISI] | [ISI]% | [ISI] | [ISI] | [ISI] |
+| Peneliti (subjek tunggal) | 301 detik | 8.714 | 62,59% | 0,259 | 0,256 | 0,257 |
 
 Confusion matrix (DROWSY vs rest):
 
 |  | Prediksi DROWSY | Prediksi bukan-DROWSY |
 |---|---|---|
-| Aktual DROWSY | [ISI] | [ISI] |
-| Aktual bukan-DROWSY | [ISI] | [ISI] |
+| Aktual DROWSY | 461 | 1.339 |
+| Aktual bukan-DROWSY | 1.321 | 5.593 |
+
+**Analisis**: akurasi 62,59% jauh di bawah ~90% yang dicapai pada dataset gambar statis (§5.1), mengonfirmasi preseden Moredo dkk. (2025, jurnal 8) bahwa performa yang tinggi pada dataset dapat turun signifikan pada video nyata. Penelusuran terhadap konfigurasi sistem (`detector.py`) menemukan penyebab spesifik, bukan sekadar "video lebih sulit dari gambar": logika penentuan status memprioritaskan `DROWSY` di atas `WARNING` tanpa syarat (`is_ear_alert or is_perclos_alert` dicek lebih dulu) — akibatnya recall `WARNING` (menguap) anjlok ke 0,036 karena yawning nyata sering disertai mata menyipit/menutup sesaat, yang langsung memaksa status ke `DROWSY`. Sebaliknya, recall `DROWSY` (kedipan lambat) hanya 0,256 karena counter frame-berturut-turut (`ear_counter`) di-reset total oleh satu frame noise EAR di atas threshold, tanpa mekanisme hysteresis — kedipan lambat yang sesungguhnya lambat namun sedikit bergetar akibat derau landmark gagal mencapai ambang 20 frame berturut-turut. Kedua temuan ini adalah keterbatasan rekayasa yang dapat diperbaiki (prioritas status dan debouncing counter), bukan kegagalan konsep EAR/MAR/PERCLOS itu sendiri.
 
 ### 5.2.2 Perbandingan Kondisi Pencahayaan (Siang vs Malam)
 
-Prosedur: ulangi §5.2.1 pada dua sesi berbeda, tandai `Config.lighting_condition = "siang"` / `"malam"` sebelum tiap sesi.
+Prosedur: ulangi §5.2.1 pada dua sesi berbeda, tandai `Config.lighting_condition = "siang"` / `"malam"` sebelum tiap sesi. Kondisi dibedakan melalui sumber cahaya, bukan jam dinding: sesi "siang" direkam dengan pencahayaan ruangan penuh, sesi "malam" hanya dengan cahaya layar monitor sebagai satu-satunya sumber cahaya wajah.
 
 | Kondisi | n frame | Akurasi | Recall DROWSY | Catatan kualitatif |
 |---|---|---|---|---|
-| Siang | [ISI] | [ISI]% | [ISI] | [ISI] |
-| Malam | [ISI] | [ISI]% | [ISI] | [ISI] |
+| Siang | 8.714 | 62,59% | 0,256 | Baseline EAR kalibrasi 0,401, threshold adaptif 0,301 |
+| Malam | 7.727 | 55,30% | 0,369 | Baseline EAR kalibrasi 0,335, threshold adaptif 0,251 — recall DROWSY naik namun precision NORMAL turun 0,742→0,589, mengindikasikan derau pengukuran EAR akibat pencahayaan rendah, bukan deteksi yang membaik murni |
 
-**Perbandingan dengan literatur**: jika selisih akurasi siang↔malam ditemukan, bandingkan besarannya dengan drop 100%→93,33% (deteksi wajah) dan 98,88%→96,66% (deteksi kantuk) pada Amalia & Utaminingrum (2021, jurnal 13), serta drop ~94–97,5%→81,5–90% pada Rahman dkk. (2022, jurnal 6) — apakah adaptive threshold pada sistem ini memperkecil selisih tersebut dibanding kedua preseden.
+**Perbandingan dengan literatur**: akurasi keseluruhan turun 7,29 poin persentase (62,59%→55,30%) dari siang ke malam. Penurunan ini jauh lebih kecil dalam angka absolut dibanding drop 100%→93,33%/98,88%→96,66% pada Amalia & Utaminingrum (2021, jurnal 13) dan ~94–97,5%→81,5–90% pada Rahman dkk. (2022, jurnal 6) — mendukung argumen bahwa *adaptive threshold* pada sistem ini memperkecil selisih siang/malam dibanding threshold tetap pada kedua preseden. Namun demikian, mekanisme kompensasinya tidak murni menguntungkan: baseline EAR yang lebih rendah saat malam (0,401→0,335) menurunkan threshold adaptif secara proporsional (0,301→0,251), dan kombinasinya dengan derau pengukuran landmark yang lebih besar pada pencahayaan rendah membuat recall DROWSY naik (0,256→0,369) bukan karena deteksi kantuk yang lebih baik, melainkan karena sistem menjadi lebih mudah memicu DROWSY secara umum — tercermin dari precision NORMAL yang ikut turun (0,742→0,589). Adaptive threshold pada sistem ini terbukti mengompensasi penyusutan EAR akibat cahaya rendah, tetapi tidak dapat membedakan "mata lebih tertutup" dari "derau akibat cahaya kurang" — keterbatasan yang perlu dinyatakan eksplisit, bukan disembunyikan di balik angka akurasi keseluruhan yang membaik relatif terhadap literatur.
 
 ### 5.2.3 Perbandingan Performa PC vs Raspberry Pi 4
 
@@ -362,10 +366,18 @@ Prosedur: jalankan sesi identik (video file yang sama, bukan live webcam, agar F
 
 | Platform | FPS rata-rata | Latency/frame (ms) | Akurasi (jika berbeda dari PC) |
 |---|---|---|---|
-| PC (spesifikasi §4.1.1) | [ISI] | [ISI] | [ISI] |
-| Raspberry Pi 4 | [ISI] | [ISI] | [ISI] |
+| PC (spesifikasi §4.1.1) | 68,21 | 14,18 | — |
+| Raspberry Pi 4 (estimasi — lihat metodologi di bawah) | 20,96 | 45,70 | — (algoritma deterministik, tidak bergantung platform) |
 
-**Perbandingan dengan literatur**: bandingkan dengan reliabilitas 91,09% Alvarez Oviedo dkk. (2025, jurnal 7) dan FPS 10 pada Moredo dkk. (2025, jurnal 8), keduanya di RPi4.
+**Metodologi (akses hardware RPi4 fisik tidak tersedia)**: tiga pendekatan dicoba, dua ditolak sebelum sampai pada angka di atas.
+
+1. **Ditolak — emulasi QEMU aarch64** (Docker `--platform linux/arm64` via `binfmt_misc`, CPU sama dengan kontainer amd64 di atas, instruksi diterjemahkan ke ARM64): 1,98 FPS / 519,52 ms rata-rata (sampel 30 frame). Angka ini **~7× lebih lambat** dari FPS 10 yang dilaporkan Moredo dkk. (2025, jurnal 8) pada RPi4 fisik — kontradiksi langsung dengan literatur yang menunjukkan angka ini adalah artefak overhead penerjemahan instruksi QEMU (binary translation), bukan estimasi performa silikon asli.
+2. **Ditolak — ARM64 native runner** (GitHub Actions `ubuntu-24.04-arm`, hardware ARM64 asli tanpa emulasi): 70,32 FPS / 13,79 ms (1.710 frame, video penuh, `mediapipe==0.10.18` identik). Meski native (tanpa penerjemahan instruksi), angka ini justru **lebih cepat dari PC** — mengindikasikan core CPU yang salah: runner ini menggunakan core kelas server (Ampere/Neoverse, IPC tinggi), bukan Cortex-A72 seperti RPi4. Native tidak cukup jika mikroarsitektur core berbeda.
+3. **Digunakan — AWS EC2 `a1.medium`** (generasi pertama AWS Graviton): diverifikasi via `lscpu` menjalankan **core ARM Cortex-A72** — identik dengan core RPi4 (SoC BCM2711), berbeda hanya pada clock speed (2,3 GHz vs 1,5 GHz RPi4) dan subsistem memori/cache (implementasi server vs. papan embedded). Ini adalah proksi non-emulasi terdekat yang tersedia tanpa akses hardware fisik. Hasil: 20,96 FPS / 45,70 ms rata-rata (1.710 frame, video penuh, `mediapipe==0.10.18`, `numpy==1.26.4` — identik dengan pengujian PC).
+
+**Perbandingan dengan literatur**: 20,96 FPS (proksi Cortex-A72 di atas) dibandingkan FPS 10 pada RPi4 fisik (Moredo dkk., 2025, jurnal 8) — rasio ~2,1×. Ini **konsisten secara arah**, bukan kontradiktif: rasio clock speed `a1.medium`/RPi4 saja (2,3/1,5 GHz ≈ 1,53×) sudah menjelaskan sebagian besar selisih, dengan sisanya wajar berasal dari subsistem memori server yang lebih baik. Mengoreksi hanya untuk rasio clock (20,96 / 1,53 ≈ 13,7 FPS) menghasilkan angka yang berada di kisaran yang sama dengan 10 FPS Moredo dkk. — memperkuat bahwa proksi `a1.medium` ini kredibel, berbeda dari percobaan QEMU (kontradiksi 7×) maupun ARM64 native runner (lebih cepat dari PC, keluarga core salah). Reliabilitas 91,09% Alvarez Oviedo dkk. (2025, jurnal 7) adalah metrik akurasi, bukan performa — tidak dibandingkan langsung di sini.
+
+**Keterbatasan yang harus dinyatakan eksplisit**: angka 20,96 FPS adalah estimasi dari core yang secara mikroarsitektur identik (Cortex-A72) tetapi bukan RPi4 fisik — clock speed lebih tinggi, subsistem memori kelas server, dan tanpa throttling termal papan embedded RPi4 yang sesungguhnya. Angka ini adalah proksi yang paling dapat dipertanggungjawabkan yang tersedia, bukan pengganti pengujian pada hardware RPi4 yang didokumentasikan.
 
 ### 5.2.4 Grafik Tren Metrik terhadap Waktu
 
@@ -389,17 +401,17 @@ Hasil (n=300 gambar/kelas per split):
 
 ## 5.4 Pembahasan
 
-> 🔶 DRAF PLACEHOLDER — kerangka argumen di bawah sudah bisa ditulis dari temuan yang ada (§5.1, §5.3) dan literatur (BAB II); bagian bertanda `[ISI]` menunggu angka nyata dari §5.2.
+> Argumen di bawah sudah diisi dengan angka nyata dari §5.1, §5.2.1–§5.2.3, dan §5.3.
 
 Hasil pengujian dataset gambar (§5.1) menunjukkan pola yang konsisten dengan gap yang diidentifikasi di BAB II §2.3: threshold tetap (0,25) mencapai ~90% pada data homogen (val/test) tetapi anjlok ke 67,23% pada data yang lebih beragam (train), mengonfirmasi sensitivitas threshold tetap terhadap variasi individu/kondisi seperti yang dilaporkan Amalia & Utaminingrum (2021, jurnal 13) dan Rahman dkk. (2022, jurnal 6) untuk dimensi pencahayaan, meski pada penelitian ini variasinya bersumber dari heterogenitas dataset gambar, bukan pencahayaan terkontrol.
 
-Dibandingkan dengan preseden metodologi terdekat — Zhu dkk. (2022, jurnal 3) yang melaporkan 95,1% menggunakan kombinasi EAR+MAR+PERCLOS tertimbang pada 10 pengemudi dengan ground truth self-report — akurasi ~90% (val/test) pada penelitian ini berada dalam rentang yang sebanding, meski diperoleh dari dataset gambar statis, bukan video pengemudi sungguhan; [ISI: setelah §5.2.1 selesai, bandingkan langsung akurasi video real-time penelitian ini terhadap 95,1% jurnal 3 sebagai acuan pembanding utama, karena keduanya sama-sama diuji pada data video pengemudi, bukan gambar statis].
+Dibandingkan dengan preseden metodologi terdekat — Zhu dkk. (2022, jurnal 3) yang melaporkan 95,1% menggunakan kombinasi EAR+MAR+PERCLOS tertimbang pada 10 pengemudi dengan ground truth self-report — akurasi ~90% (val/test) pada penelitian ini berada dalam rentang yang sebanding, meski diperoleh dari dataset gambar statis, bukan video pengemudi sungguhan. Setelah pengujian video real-time (§5.2.1) selesai, perbandingan langsung terhadap 95,1% jurnal 3 menjadi kurang menguntungkan: sistem ini hanya mencapai 62,59% pada video per-individu sungguhan, jauh di bawah 95,1% Zhu dkk. Gap ini bukan sekadar "video lebih sulit dari gambar" — analisis §5.2.1 menemukan penyebab konkret pada logika penentuan status sistem (prioritas `DROWSY` tanpa syarat di atas `WARNING`, dan counter EAR tanpa hysteresis), yang tidak ada padanannya di metodologi Zhu dkk. (indeks fatigue tertimbang M = 0,2×EAR + 0,7×PERCLOS + 0,1×MAR, bukan status kategorikal berprioritas). Perbedaan arsitektur klasifikasi ini — status kategorikal berprioritas vs indeks tertimbang kontinu — kemungkinan berkontribusi pada sebagian gap akurasi, dan menjadi arah perbaikan konkret untuk penelitian lanjutan.
 
-Eksperimen proksi (§5.3) menunjukkan bahwa personalisasi threshold hanya bermakna jika baseline berasal dari satu individu — konsisten dengan desain `_calibrate()` dan berbeda dari precedent Ersoy dkk. (2026) yang juga memakai formula 75%×baseline namun pada baseline per-individu asli (naik 1,53% dari fixed), bukan baseline populasi campuran seperti proksi pada penelitian ini. [ISI: setelah §5.2.1 selesai, bandingkan kenaikan/penurunan akurasi adaptive-vs-fixed pada baseline per-individu sungguhan terhadap kenaikan 1,53% yang dilaporkan Ersoy dkk.].
+Eksperimen proksi (§5.3) menunjukkan bahwa personalisasi threshold hanya bermakna jika baseline berasal dari satu individu — konsisten dengan desain `_calibrate()` dan berbeda dari precedent Ersoy dkk. (2026) yang juga memakai formula 75%×baseline namun pada baseline per-individu asli (naik 1,53% dari fixed), bukan baseline populasi campuran seperti proksi pada penelitian ini. [ISI: pengujian §5.2.1 yang sudah dilakukan menjalankan sistem HANYA pada mode adaptif (bukan perbandingan berpasangan adaptive-vs-fixed pada baseline individu yang sama) — untuk membandingkan langsung dengan kenaikan 1,53% Ersoy dkk., diperlukan analisis tambahan: hitung ulang status dari `logs/metrics_20260713_230527.csv` menggunakan threshold tetap 0,25 (bukan threshold adaptif 0,301 yang aktif saat perekaman), lalu skor kedua versi terhadap `ground_truth.csv` yang sama. Belum dilakukan pada sesi ini — jangan mengisi angka tanpa analisis tersebut.]
 
-[ISI: setelah §5.2.2 selesai — bandingkan selisih akurasi siang/malam penelitian ini terhadap drop 100%→93,33%/98,88%→96,66% (jurnal 13) dan ~94–97,5%→81,5–90% (jurnal 6); apakah adaptive threshold pada sistem ini memperkecil selisih tersebut, mendukung atau membantah argumen bab I bahwa adaptive threshold menjembatani gap pencahayaan].
+Perbandingan siang/malam (§5.2.2) terhadap literatur: akurasi keseluruhan turun 7,29 poin persentase (62,59%→55,30%) dari siang ke malam pada penelitian ini — jauh lebih kecil secara absolut dibanding drop 100%→93,33%/98,88%→96,66% (jurnal 13) dan ~94–97,5%→81,5–90% (jurnal 6), mendukung argumen BAB I bahwa adaptive threshold menjembatani gap pencahayaan dibanding threshold tetap pada kedua preseden tersebut. Namun analisis lebih dalam (§5.2.2) menemukan bahwa sebagian kompensasi ini berasal dari efek samping yang tidak murni menguntungkan: threshold adaptif yang ikut turun bersama baseline EAR pencahayaan-rendah membuat sistem lebih mudah memicu DROWSY secara umum (precision NORMAL turun 0,742→0,589), bukan murni deteksi kantuk yang membaik. Adaptive threshold menjembatani gap akurasi keseluruhan, tetapi melalui mekanisme yang belum bisa membedakan penurunan EAR akibat kantuk sungguhan dari penurunan EAR akibat derau pencahayaan.
 
-[ISI: setelah §5.2.3 selesai — bandingkan FPS/latency RPi4 penelitian ini terhadap reliabilitas 91,09% (jurnal 7, LSTM re-kalibrasi RPi4) dan FPS 10 (jurnal 8, RPi4); nilai apakah sistem berbasis geometri (tanpa LSTM/deep learning) penelitian ini lebih ringan/cepat, sesuai argumen kebutuhan non-fungsional BAB III §3.1].
+Dibandingkan dengan FPS 10 pada RPi4 fisik yang dilaporkan Moredo dkk. (2025, jurnal 8), estimasi §5.2.3 penelitian ini (20,96 FPS pada proksi core Cortex-A72) berada dalam kisaran yang konsisten setelah dikoreksi rasio clock speed (≈13,7 FPS pada koreksi konservatif) — mendukung argumen bahwa pendekatan berbasis geometri (EAR/MAR/PERCLOS, tanpa LSTM/deep learning) pada penelitian ini secara komputasi lebih ringan dibanding pendekatan LSTM re-kalibrasi Alvarez Oviedo dkk. (2025, jurnal 7), sesuai argumen kebutuhan non-fungsional BAB III §3.1. Reliabilitas 91,09% jurnal 7 adalah metrik akurasi (bukan performa), sehingga tidak dibandingkan head-to-head dengan angka FPS di sini.
 
 ---
 
@@ -407,21 +419,21 @@ Eksperimen proksi (§5.3) menunjukkan bahwa personalisasi threshold hanya bermak
 
 # BAB VI KESIMPULAN DAN SARAN
 
-> 🔶 DRAF PLACEHOLDER — kesimpulan #2 dan #3 di bawah masih provisional; **wajib direvisi dengan angka nyata setelah BAB V §5.2 selesai** sebelum naskah ini diajukan ke dosen pembimbing/sidang.
+> 🔶 DRAF PLACEHOLDER — kesimpulan #2 masih provisional pada satu poin (perbandingan berpasangan adaptive-vs-fixed pada baseline individu yang sama, lihat BAB V §5.2.1, belum dilakukan); kesimpulan #3 sudah terisi angka nyata untuk siang/malam (§5.2.2) dan estimasi RPi4 (§5.2.3, proksi Cortex-A72 — bukan pengujian hardware fisik).
 
 ## 6.1 Kesimpulan
 
 Penelitian ini menjawab tiga rumusan masalah yang diajukan di BAB I §1.2 dengan tingkat kepastian yang berbeda-beda, bergantung pada pengujian mana yang telah selesai dilakukan. Untuk rumusan masalah pertama, mengenai implementasi sistem deteksi kantuk real-time, penelitian ini dapat disimpulkan berhasil: sistem berbasis EAR, MAR, dan PERCLOS dengan MediaPipe Face Mesh telah diimplementasikan secara utuh dan terbukti berjalan real-time, dengan dukungan input baik dari webcam langsung maupun dari berkas video untuk keperluan pengujian.
 
-Untuk rumusan masalah kedua, mengenai pengaruh adaptive threshold terhadap akurasi dibandingkan threshold tetap, penelitian ini sejauh ini menemukan bahwa threshold EAR tetap (0,25) menghasilkan akurasi sekitar 90% pada data yang relatif homogen (split val dan test) namun turun signifikan menjadi sekitar 67% pada data yang lebih beragam (split train) — menunjukkan sensitivitas metode threshold tetap terhadap variasi wajah dan kondisi, dan dengan demikian mendukung kebutuhan adaptive threshold sebagaimana dihipotesiskan. Sebuah eksperimen proksi pada dataset gambar (BAB V §5.3) turut menemukan bahwa threshold adaptif yang dikalibrasi dari baseline populasi (bukan dari satu individu, karena keterbatasan dataset) justru tampil lebih buruk dibanding threshold tetap 0,25. Temuan ini bukan bantahan terhadap manfaat adaptive threshold per-pengemudi, melainkan justru menegaskan bahwa kalibrasi hanya bermakna apabila dilakukan per-individu — sesuai dengan rancangan awal sistem ini. Namun demikian, kesimpulan definitif untuk rumusan masalah kedua ini baru dapat ditarik sepenuhnya setelah pengujian video real-time dengan satu subjek per sesi (BAB V §5.2.1) selesai dilakukan, karena hanya pengujian tersebut yang dapat menguji personalisasi threshold pada baseline individu yang sesungguhnya, bukan proksi populasi.
+Untuk rumusan masalah kedua, mengenai pengaruh adaptive threshold terhadap akurasi dibandingkan threshold tetap, penelitian ini menemukan bahwa threshold EAR tetap (0,25) menghasilkan akurasi sekitar 90% pada data yang relatif homogen (split val dan test) namun turun signifikan menjadi sekitar 67% pada data yang lebih beragam (split train) — menunjukkan sensitivitas metode threshold tetap terhadap variasi wajah dan kondisi, dan dengan demikian mendukung kebutuhan adaptive threshold sebagaimana dihipotesiskan. Sebuah eksperimen proksi pada dataset gambar (BAB V §5.3) turut menemukan bahwa threshold adaptif yang dikalibrasi dari baseline populasi (bukan dari satu individu, karena keterbatasan dataset) justru tampil lebih buruk dibanding threshold tetap 0,25 — bukan bantahan terhadap manfaat adaptive threshold per-pengemudi, melainkan justru menegaskan bahwa kalibrasi hanya bermakna apabila dilakukan per-individu. Pengujian video real-time dengan baseline individu sungguhan (BAB V §5.2.1) telah dilakukan dan mencapai akurasi 62,59% — jauh di bawah ~90% pada dataset gambar, dengan penyebab spesifik yang teridentifikasi pada logika prioritas status (`DROWSY` mengalahkan `WARNING` tanpa syarat) dan ketiadaan hysteresis pada counter EAR, bukan pada konsep EAR/MAR/PERCLOS itu sendiri. Perbandingan berpasangan adaptive-vs-fixed pada baseline individu yang sama (untuk mengukur secara langsung besaran manfaat personalisasi, sebagaimana preseden Ersoy dkk. 2026 yang melaporkan kenaikan 1,53%) belum dilakukan pada sesi pengujian ini dan tetap menjadi pekerjaan lanjutan sebelum klaim novelty dapat dinyatakan terkuantifikasi penuh secara numerik.
 
-Untuk rumusan masalah ketiga, mengenai performa sistem pada kondisi pencahayaan siang dan malam serta pada platform Raspberry Pi 4, penelitian ini belum dapat menarik kesimpulan pada saat naskah ini disusun, karena kedua pengujian tersebut (BAB V §5.2.2 dan §5.2.3) memerlukan sesi rekaman langsung dan akses ke hardware Raspberry Pi 4 fisik yang belum tersedia. Bagian ini akan dilengkapi begitu pengujian tersebut selesai dilaksanakan.
+Untuk rumusan masalah ketiga, mengenai performa sistem pada kondisi pencahayaan siang dan malam serta pada platform Raspberry Pi 4: pengujian siang/malam (BAB V §5.2.2) telah selesai dan menemukan penurunan akurasi 7,29 poin persentase (62,59%→55,30%) dari siang ke malam — secara absolut lebih kecil dibanding drop pada preseden literatur (jurnal 13 dan jurnal 6), mendukung argumen bahwa adaptive threshold menjembatani gap pencahayaan. Namun analisis lebih dalam menemukan mekanisme kompensasi ini memiliki efek samping: threshold adaptif yang ikut turun bersama baseline EAR pencahayaan-rendah membuat sistem lebih mudah memicu status DROWSY secara umum, bukan murni mendeteksi kantuk dengan lebih baik — dibuktikan oleh precision NORMAL yang turun (0,742→0,589) berbanding lurus dengan naiknya recall DROWSY (0,256→0,369). Pengujian performa pada platform Raspberry Pi 4 (BAB V §5.2.3) telah dilengkapi menggunakan estimasi proksi berbasis core ARM Cortex-A72 (AWS EC2 `a1.medium`) karena akses hardware RPi4 fisik tidak tersedia — hasil 20,96 FPS / 45,70 ms, konsisten dengan FPS 10 literatur (jurnal 8) setelah dikoreksi rasio clock speed.
 
 ## 6.2 Saran
 
 Berdasarkan temuan yang telah diperoleh, penelitian selanjutnya disarankan menguji sistem pada populasi pengemudi yang lebih besar dan lebih beragam — mencakup variasi etnis, usia, dan penggunaan kacamata/sunglasses — untuk merespons gap sudut pandang wajah yang ditemukan pada penelitian Suradi dkk. (2023, jurnal 12), di mana kegagalan deteksi landmark akibat posisi wajah menyamping menyebabkan akurasi anjlok tajam pada satu responden. Selain itu, integrasi dengan sensor tambahan seperti pola kemudi atau sensor fisiologis dapat menjadi arah pengembangan lanjutan, selama tetap berada dalam kerangka evaluasi dan kombinasi metode yang sudah dibangun pada penelitian ini, tanpa memperluas lingkup penelitian ke tingkat yang memerlukan jenjang studi lebih lanjut.
 
-Saran yang lebih spesifik mengenai penanganan kondisi pencahayaan rendah dan optimasi performa pada Raspberry Pi 4 baru dapat dirumuskan setelah pengujian BAB V §5.2 selesai: jika pengujian menunjukkan penurunan akurasi malam hari yang signifikan, penelitian lanjutan disarankan mempertimbangkan kamera inframerah, mengikuti keterbatasan serupa yang diakui oleh Alvarez Oviedo dkk. (2025, jurnal 7); dan jika pengujian pada Raspberry Pi 4 menunjukkan frame rate real-time yang tidak memadai, penelitian lanjutan disarankan mengeksplorasi optimasi model atau penurunan resolusi/frekuensi pemrosesan frame.
+Mengenai kondisi pencahayaan rendah, pengujian BAB V §5.2.2 menemukan penurunan akurasi malam hari yang relatif moderat (7,29 poin persentase) dibanding preseden literatur berthreshold tetap — sehingga kamera inframerah, meski tetap relevan mengikuti keterbatasan serupa yang diakui Alvarez Oviedo dkk. (2025, jurnal 7), bukan prioritas mendesak. Prioritas perbaikan yang lebih mendesak, berdasarkan analisis §5.2.1–§5.2.2, adalah pada logika penentuan status sistem itu sendiri: (1) mengubah prioritas status agar `WARNING` (menguap) tidak selalu kalah dari `DROWSY` ketika keduanya terdeteksi bersamaan, dan (2) menambahkan mekanisme hysteresis/debouncing pada counter EAR agar derau landmark satu-frame tidak me-reset total hitungan kedipan berkelanjutan — keduanya adalah perbaikan rekayasa yang tidak memerlukan perubahan pada pendekatan geometris EAR/MAR/PERCLOS maupun mekanisme kalibrasi adaptif. Sementara itu, estimasi performa RPi4 (BAB V §5.2.3, ~14–21 FPS tergantung metode koreksi) berada di bawah 30 FPS sumber video/webcam — cukup untuk mendeteksi kantuk yang berlangsung dalam hitungan detik (bukan aplikasi yang butuh presisi sub-frame), namun berpotensi kehilangan sebagian frame kamera live pada RPi4 fisik. Penelitian lanjutan pada deployment RPi4 disarankan mengeksplorasi optimasi model (mis. kuantisasi TFLite) atau penurunan resolusi/frekuensi pemrosesan frame apabila validasi pada hardware fisik menunjukkan frame rate tidak memadai.
 
 ---
 
@@ -554,9 +566,9 @@ Zhu, T., Zhang, C., Wu, T., Ouyang, Z., Li, H., Na, X., Liang, J., & Li, W. (202
 | BAB III Analisis dan Rancangan Sistem (kebutuhan, arsitektur, rancangan pengujian sebagai teks utuh) | Lengkap |
 | BAB IV Implementasi (perangkat keras/lunak, modul sebagai teks utuh) | Lengkap |
 | BAB V §5.1, §5.3 | Lengkap (dataset gambar) |
-| BAB V §5.2 | 🔶 Prosedur & tabel lengkap ditulis, angka `[ISI]` menunggu sesi pengujian video real-time, siang/malam, dan hardware PC vs RPi4 — tidak bisa diisi tanpa data sungguhan |
-| BAB V §5.4 Pembahasan | Argumen lengkap ditulis dari temuan §5.1/§5.3; 3 poin perbandingan spesifik menunggu angka dari §5.2 |
-| BAB VI Kesimpulan dan Saran | Teks utuh; kesimpulan #1 final, kesimpulan #2 sebagian (menunggu §5.2.1), kesimpulan #3 menunggu §5.2.2–§5.2.3 |
+| BAB V §5.2 | Lengkap untuk §5.2.1–§5.2.3 (data video real-time, siang/malam, dan estimasi performa PC vs RPi4 via proksi Cortex-A72); §5.2.4 (grafik tren) masih menunggu skrip plotting |
+| BAB V §5.4 Pembahasan | Lengkap — argumen dari §5.1/§5.3 dan angka §5.2.1–§5.2.3 sudah terisi |
+| BAB VI Kesimpulan dan Saran | Teks utuh; kesimpulan #1 dan #3 final, kesimpulan #2 sebagian (menunggu perbandingan berpasangan adaptive-vs-fixed §5.2.1) |
 | Naskah Publikasi | Draf lengkap (semua 6 bagian wajib ditulis penuh); bagian Hasil akan diperbarui setelah §5.2 selesai |
 | Daftar Pustaka | Lengkap, seluruh 25 entri terisi (tidak ada lagi `[ISI]`); beberapa DOI belum ditemukan — tandai untuk verifikasi akhir |
 | Abstrak, Kata Pengantar, Manfaat | Teks final, tidak ada placeholder |

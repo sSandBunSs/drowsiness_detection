@@ -29,7 +29,7 @@ Temuan ini mengindikasikan bahwa **threshold EAR tetap sensitif terhadap variasi
 
 - [x] Pengujian akurasi pada video real-time (webcam) dengan ground truth manual — selesai, lihat §5.2.2 (sesi kondisi terang dipakai juga sebagai baseline pencahayaan baik).
 - [x] Pengujian pada kondisi pencahayaan siang vs malam secara langsung (bukan dari dataset gambar statis) — selesai, lihat §5.2.2.
-- [ ] Perbandingan performa (FPS, latency) PC vs Raspberry Pi 4 — perlu hardware RPi4.
+- [x] Perbandingan performa (FPS, latency) PC vs Raspberry Pi 4 — selesai, lihat §5.2.3. Akses hardware RPi4 fisik tidak tersedia; angka RPi4 diestimasi melalui AWS EC2 `a1.medium` (core ARM Cortex-A72, identik dengan core RPi4 — bukan emulasi) setelah percobaan awal via emulasi QEMU dan ARM64 native runner terbukti tidak representatif (metodologi lengkap ada di §5.2.3).
 - [ ] Grafik tren EAR/MAR/PERCLOS terhadap waktu dari sesi rekaman nyata.
 - [x] Evaluasi pengaruh *adaptive threshold* vs *fixed threshold* — **dilakukan sebagai eksperimen proksi pada dataset gambar (§5.3), TIDAK dapat menggantikan pengujian video per-individu yang masih tersisa di atas.**
 
@@ -87,4 +87,4 @@ Hasil (n=300 gambar/kelas per split, dari `evaluate_dataset_images.py datasets/t
 
 ## 5.4 Pembahasan
 
-> Diisi setelah seluruh pengujian di §5.2 selesai — bandingkan hasil dengan 15 jurnal penelitian terdahulu di `BAB2.md`, khususnya jurnal 1 dan 3 (metodologi paling mirip: EAR+MAR+PERCLOS), dan jurnal 3's akurasi 95,1% sebagai acuan pembanding utama.
+> §5.2.1–§5.2.3 selesai (lihat `NASKAH_TA_LENGKAP.md` §5.4 untuk pembahasan lengkap, termasuk perbandingan dengan 15 jurnal di `BAB2.md` — jurnal 1 dan 3 metodologi paling mirip, jurnal 3's akurasi 95,1% sebagai acuan utama; jurnal 8's FPS 10 RPi4 sebagai acuan performa §5.2.3). §5.2.4 (grafik tren) masih menunggu skrip plotting.

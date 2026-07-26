@@ -3,9 +3,9 @@
 ## 4.1 Perangkat Keras dan Perangkat Lunak
 
 ### 4.1.1 Perangkat Keras
-- PC: Windows 10 Pro, Intel Core i7-4790, RAM 10GB, GPU RX550 4GB, SSD 512GB
-- Webcam USB
-- Raspberry Pi 4 — untuk pengujian platform embedded (**belum dilakukan** per saat draf ini ditulis, memerlukan hardware fisik — lihat `BAB5.md` §5.2)
+- PC: Ubuntu 24.04 LTS (WSL2), Intel Core i5-12450H, RAM 12GB
+- Webcam USB (pengembangan awal); video berkas untuk pengujian performa §5.2.3 (video sumber sama dipakai di kedua platform, lihat `BAB3.md` §3.3)
+- Raspberry Pi 4 (aarch64) — akses hardware fisik tidak tersedia; performa RPi4 diestimasi melalui AWS EC2 `a1.medium` (core ARM Cortex-A72, identik dengan core RPi4/BCM2711 — diverifikasi via `lscpu`) menjalankan pipeline deteksi identik dengan `mediapipe==0.10.18` — lihat metodologi lengkap (termasuk percobaan emulasi QEMU dan ARM64 native runner yang ditolak karena tidak representatif) di `BAB5.md` §5.2.3
 
 ### 4.1.2 Perangkat Lunak
 - Python 3.10 (conda environment `drowsy`)
@@ -31,6 +31,6 @@ Sistem diimplementasikan dalam Python 3.10, menggunakan MediaPipe Tasks API (`Fa
 | `perclos_threshold` | 0.35 | 35% waktu mata tertutup dianggap kantuk |
 | `calibration_frames` | 100 | Jumlah frame kalibrasi baseline |
 
-`Config` juga mendeteksi otomatis platform Raspberry Pi via `/proc/device-tree/model` untuk menyesuaikan backend kamera/buffering — bagian dari implementasi rancangan "Skenario platform" di `BAB3.md` §3.3, meski pengujian langsung di hardware RPi4 belum dilakukan.
+`Config` juga mendeteksi otomatis platform Raspberry Pi via `/proc/device-tree/model` untuk menyesuaikan backend kamera/buffering — bagian dari implementasi rancangan "Skenario platform" di `BAB3.md` §3.3. Pengujian langsung di hardware RPi4 fisik belum dilakukan (akses tidak tersedia); performa platform aarch64 diestimasi melalui proksi core Cortex-A72 (AWS EC2 `a1.medium`, lihat `BAB5.md` §5.2.3).
 
 Hasil pengujian terhadap implementasi ini (akurasi pada dataset gambar, eksperimen adaptive vs fixed threshold, dan pembahasan) disajikan di `BAB5.md`.
