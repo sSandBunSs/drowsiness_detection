@@ -5,8 +5,18 @@
 
 # Core
 opencv-python>=4.8.0
-mediapipe>=0.10.0
-numpy>=1.24.0
+# mediapipe dropped Linux aarch64 (RPi4/ARM64) wheels after 0.10.18, and 0.10.18
+# only has wheels for Python 3.9-3.12 — so aarch64 needs ==0.10.18 on a 3.9-3.12
+# venv, while x86/Windows on Python 3.13 needs >=0.10.30 (first cp313 wheels).
+# For §5.2.3 benchmark comparability, both platforms were benchmarked in
+# python:3.12 containers with mediapipe==0.10.18 (see BAB5 §5.2.3).
+mediapipe==0.10.18; platform_machine == "aarch64" or platform_machine == "arm64"
+mediapipe>=0.10.30; platform_machine != "aarch64" and platform_machine != "arm64"
+# mediapipe==0.10.18 itself declares numpy<2; without pinning it here too, pip's
+# resolver silently downgrades mediapipe to 0.10.14 to satisfy an unpinned
+# jax/jaxlib transitive dep that wants numpy>=2, instead of erroring loudly.
+numpy>=1.24.0,<2; platform_machine == "aarch64" or platform_machine == "arm64"
+numpy>=1.24.0; platform_machine != "aarch64" and platform_machine != "arm64"
 
 # Audio (Linux/RPi — opsional, fallback ke aplay)
 # pyaudio>=0.2.13   # install manual jika diperlukan
