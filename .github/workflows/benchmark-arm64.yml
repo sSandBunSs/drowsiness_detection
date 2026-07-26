@@ -1,0 +1,40 @@
+name: Benchmark (native ARM64)
+
+# Manual only — this is a one-off performance measurement for BAB V §5.2.3
+# (RPi4-class ARM64 substitute), not a CI check that should run on every push.
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-24.04-arm  # real ARM64 hardware, not emulated
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"  # required for the mediapipe==0.10.18 aarch64 wheel
+
+      - name: Install system deps for opencv
+        run: sudo apt-get update && sudo apt-get install -y libgl1
+
+      - name: Install Python deps
+        run: pip install -r requirements.txt
+
+      - name: Report resolved versions
+        run: |
+          python -c "import platform; print('arch:', platform.machine())"
+          python -c "import numpy; print('numpy:', numpy.__version__)"
+          python -c "import mediapipe; print('mediapipe:', mediapipe.__version__)"
+
+      - name: Run benchmark (full video)
+        run: python benchmark.py logs/benchmark_source.avi --csv logs/bench_arm64_native.csv
+
+      - name: Show result
+        run: |
+          cat logs/bench_arm64_native.csv | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bench-arm64-native
+          path: logs/bench_arm64_native.csv
