@@ -32,12 +32,12 @@ Format halaman judul, halaman pengesahan, halaman pernyataan kesiapan ujian, dan
 
 ## Naskah Publikasi (WAJIB, terpisah dari laporan TA)
 
-> Per Surat Edaran Ditjen Dikti No. 152/E/T/2012 — wajib bagi lulusan S1 untuk publikasi di jurnal non-terakreditasi. **Belum dikerjakan sama sekali** — item baru, ditemukan dari pedoman resmi.
+> Per Surat Edaran Ditjen Dikti No. 152/E/T/2012 — wajib bagi lulusan S1 untuk publikasi di jurnal non-terakreditasi. **Draf teks sudah lengkap** di `NASKAH_TA_LENGKAP.md` §Naskah Publikasi (Judul, Abstrak, §1–§6, Daftar Pustaka) dengan angka hasil nyata dari BAB V §5.1–§5.3. Yang tersisa hanya pemformatan/pemisahan ke berkas `.doc` terpisah dan kelengkapan tanda tangan.
 
-- [ ] Draf naskah publikasi, 6–10 halaman, format `.doc`, A4, margin 2cm semua sisi, spasi 1, Times New Roman 10pt.
-- [ ] Judul naskah ≤10 kata, berbeda dari judul skripsi, berbahasa Indonesia.
-- [ ] Struktur: Abstrak (maks. 200 kata, italic) + Kata Kunci (3–5 buah) → 1. Pendahuluan → 2. Tinjauan Pustaka → 3. Metode Penelitian → 4. Hasil dan Pembahasan → 5. Kesimpulan → 6. Saran (jika perlu) → Daftar Pustaka.
-- [ ] Gambar wajib format JPG/PNG (bukan objek Office), diberi judul dengan kata "Gambar". Tabel wajib tabel native Word (bukan gambar/objek), diberi judul dengan kata "Tabel". Sub-bab dibatasi maksimal 2 level.
+- [x] Draf naskah publikasi, teks lengkap tersedia di `NASKAH_TA_LENGKAP.md` §Naskah Publikasi — [ ] masih perlu dipisah jadi berkas `.doc` tersendiri (6–10 halaman, A4, margin 2cm semua sisi, spasi 1, Times New Roman 10pt).
+- [x] Judul naskah ≤10 kata, berbeda dari judul skripsi, berbahasa Indonesia — "Deteksi Kantuk Pengemudi Real-Time dengan Adaptive Threshold EAR".
+- [x] Struktur lengkap: Abstrak + Kata Kunci → 1. Pendahuluan → 2. Tinjauan Pustaka → 3. Metode Penelitian → 4. Hasil dan Pembahasan → 5. Kesimpulan → 6. Saran → Daftar Pustaka.
+- [ ] Gambar wajib format JPG/PNG (bukan objek Office), diberi judul dengan kata "Gambar". Tabel wajib tabel native Word (bukan gambar/objek), diberi judul dengan kata "Tabel". Sub-bab dibatasi maksimal 2 level — berlaku saat konversi Markdown → Word.
 - [ ] Halaman cover, lembar pengesahan (ditandatangani pembimbing), dan lembar pernyataan (setuju/tidak setuju publikasi dengan/tanpa co-author pembimbing) — format di Lampiran 11 pedoman.
 
 ## Daftar Pustaka (Sementara)
@@ -46,12 +46,15 @@ Lihat daftar 15 referensi di `BAB2.md` §2.1 — perlu diverifikasi ulang (DOI/l
 
 ## Lampiran
 
-- [ ] Listing kode sumber (`detector.py`, `metrics_logger.py`, dst.)
-- [ ] Contoh CSV hasil logging (`logs/metrics_*.csv`, `logs/events_*.csv`)
-- [ ] Screenshot antarmuka sistem
-- [ ] Ground truth dan hasil validasi (output `validate_accuracy.py`)
-- [ ] Surat Pernyataan Keaslian Tugas Akhir (didapat saat ujian TA, tidak dibuat sendiri)
-- [ ] Surat Keterangan dari perusahaan/instansi (hanya jika penelitian melibatkan pengembangan sistem untuk perusahaan/instansi — tidak berlaku untuk penelitian ini)
+Draf lengkap ada di `LAMPIRAN.md` (Lampiran A–F) — siap disalin ke berkas
+Word lampiran.
+
+- [x] Listing kode sumber (`detector.py`, `metrics_logger.py`, dst.) — `LAMPIRAN.md` Lampiran A (manifest 8 berkas, 1.343 baris total; salin isi berkas ke Word)
+- [x] Contoh CSV hasil logging (`logs/metrics_*.csv`, `logs/events_*.csv`) — `LAMPIRAN.md` Lampiran B (potongan nyata dari sesi siang)
+- [ ] Screenshot antarmuka sistem — `LAMPIRAN.md` Lampiran C; **belum bisa dihasilkan otomatis** (sandbox tanpa webcam/display), perlu diambil manual saat `python detector.py` berjalan di PC/RPi nyata (tekan `s`)
+- [x] Ground truth dan hasil validasi (output `validate_accuracy.py`) — `LAMPIRAN.md` Lampiran D (output nyata, akurasi 62,59% cocok dengan BAB V §5.2.1)
+- [ ] Surat Pernyataan Keaslian Tugas Akhir (didapat saat ujian TA, tidak dibuat sendiri) — `LAMPIRAN.md` Lampiran E
+- [x] Surat Keterangan dari perusahaan/instansi — tidak berlaku, dinyatakan eksplisit di `LAMPIRAN.md` Lampiran F
 
 ## Peta Berkas Bab
 
@@ -64,4 +67,5 @@ Lihat daftar 15 referensi di `BAB2.md` §2.1 — perlu diverifikasi ulang (DOI/l
 | `BAB5.md` | Hasil Penelitian dan Pembahasan |
 | `BAB6.md` | Kesimpulan dan Saran |
 | `BAGIAN_PELENGKAP.md` | Berkas ini — halaman depan, naskah publikasi, lampiran, daftar pustaka |
+| `LAMPIRAN.md` | Draf isi Lampiran A–F (listing kode, contoh CSV, ground truth + output validasi, dll.) |
 | `PEDOMAN TA FTII 2022 v1.1.pdf` | Sumber kebenaran format/struktur resmi kampus |
