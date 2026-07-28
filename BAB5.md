@@ -30,8 +30,8 @@ Temuan ini mengindikasikan bahwa **threshold EAR tetap sensitif terhadap variasi
 - [x] Pengujian akurasi pada video real-time (webcam) dengan ground truth manual — selesai, lihat §5.2.2 (sesi kondisi terang dipakai juga sebagai baseline pencahayaan baik).
 - [x] Pengujian pada kondisi pencahayaan siang vs malam secara langsung (bukan dari dataset gambar statis) — selesai, lihat §5.2.2.
 - [x] Perbandingan performa (FPS, latency) PC vs Raspberry Pi 4 — selesai, lihat §5.2.3. Akses hardware RPi4 fisik tidak tersedia; angka RPi4 diestimasi melalui AWS EC2 `a1.medium` (core ARM Cortex-A72, identik dengan core RPi4 — bukan emulasi) setelah percobaan awal via emulasi QEMU dan ARM64 native runner terbukti tidak representatif (metodologi lengkap ada di §5.2.3).
-- [ ] Grafik tren EAR/MAR/PERCLOS terhadap waktu dari sesi rekaman nyata.
-- [x] Evaluasi pengaruh *adaptive threshold* vs *fixed threshold* — **dilakukan sebagai eksperimen proksi pada dataset gambar (§5.3), TIDAK dapat menggantikan pengujian video per-individu yang masih tersisa di atas.**
+- [x] Grafik tren EAR/MAR/PERCLOS terhadap waktu dari sesi rekaman nyata — selesai, lihat §5.2.4 (`plot_trends.py`, Gambar 5.1/5.2).
+- [x] Evaluasi pengaruh *adaptive threshold* vs *fixed threshold* — proksi pada dataset gambar di §5.3, DAN kini juga perbandingan berpasangan pada baseline individu asli, lihat §5.2.5.
 
 ### 5.2.2 Perbandingan Kondisi Pencahayaan (Siang vs Malam)
 
@@ -69,6 +69,21 @@ Namun demikian, temuan yang lebih menarik untuk didiskusikan bukan pada penuruna
 
 Temuan ini menunjukkan bahwa mekanisme kalibrasi adaptif pada sistem ini **secara parsial mengompensasi penyusutan EAR akibat pencahayaan rendah** (sejalan dengan klaim novelty penelitian ini), namun mekanisme yang sama **tidak dapat membedakan antara "mata yang benar-benar lebih tertutup" dengan "derau pengukuran akibat pencahayaan kurang"** — keduanya sama-sama menurunkan EAR terukur, dan sistem meresponsnya dengan cara yang identik. Ini adalah keterbatasan yang perlu dinyatakan secara eksplisit sebagai arah pengembangan lanjutan (mis. penyaringan derau EAR atau estimasi kualitas pencahayaan sebagai sinyal tambahan), bukan disembunyikan sebagai kelemahan yang tidak terlihat dari angka akurasi keseluruhan semata.
 
+### 5.2.4 Grafik Tren EAR/MAR/PERCLOS
+
+Grafik EAR/MAR/PERCLOS terhadap waktu untuk kedua sesi (§5.2.2), dengan interval `DROWSY` dari ground truth diarsir merah, dihasilkan via `plot_trends.py logs/metrics_<sesi>.csv ground_truth[_malam].csv <output.png>` (memakai ulang `load_ground_truth` dari `validate_accuracy.py` agar interval yang diarsir identik dengan yang dipakai untuk skor akurasi). Disimpan sebagai **Gambar 5.1** (`figures/gambar_5_1_trend_siang.png`, sesi siang) dan **Gambar 5.2** (`figures/gambar_5_2_trend_malam.png`, sesi malam).
+
+### 5.2.5 Perbandingan Berpasangan: Adaptive vs Fixed Threshold (Baseline Individu)
+
+Untuk mengukur langsung besaran manfaat personalisasi threshold — dibandingkan dengan kenaikan 1,53% yang dilaporkan Ersoy dkk. (2026) — status pada sesi siang (`logs/metrics_20260713_230527.csv`, baseline EAR individu 0,401) dihitung ulang menggunakan threshold tetap 0,25 (bukan threshold adaptif 0,301 yang aktif saat perekaman), lalu diskor terhadap `ground_truth.csv` yang sama. `compare_adaptive_fixed.py` mereplikasi logika penentuan status `_process_frame` di `detector.py` (EAR/MAR consecutive-frame counter, PERCLOS, prioritas status) secara offline dari kolom `ear_avg`/`mar` yang sudah tercatat, sehingga hanya threshold yang berbeda antara kedua run — bukan implementasi.
+
+| Mode | Threshold EAR | Akurasi keseluruhan | Recall DROWSY | Precision DROWSY |
+|---|---|---|---|---|
+| Adaptif (0,75×baseline individu) | 0,301 | **62,59%** | 0,256 | 0,259 |
+| Fixed | 0,25 | 60,39% | 0,077 | 0,195 |
+
+**Selisih: +2,20 poin persentase** mendukung threshold adaptif dibanding fixed pada baseline individu asli — searah dengan (meski lebih besar magnitudenya dari) kenaikan 1,53% Ersoy dkk. (2026). Perbedaan paling mencolok ada pada recall DROWSY (0,256 vs 0,077): karena threshold adaptif (0,301) berada *di atas* threshold fixed (0,25) untuk subjek ini, lebih banyak frame terklasifikasi "mata tertutup", sehingga sistem jauh lebih sensitif mendeteksi kantuk sungguhan — konsisten dengan mekanisme kalibrasi 0,75×baseline yang menyesuaikan terhadap karakteristik mata satu individu (bukan rata-rata populasi, lihat kontras dengan hasil §5.3 pada baseline campuran-subjek).
+
 ## 5.3 Eksperimen Proksi: Fixed vs Adaptive Threshold pada Dataset Gambar
 
 **Keterbatasan metodologis yang harus dinyatakan di depan**: dataset gambar (`datasets/`) tidak memiliki ID subjek — nama file hanya indeks numerik, dan manifest `train.txt` peninggalan dataset asli tidak cocok dengan nama file aktual di folder (sudah diverifikasi, lihat riwayat sesi). Akibatnya, kalibrasi adaptif *per-pengemudi* yang sesungguhnya (baseline dari 100 frame pertama SATU orang yang sama, seperti `_calibrate()` di `detector.py`) tidak bisa direplikasi pada dataset ini. Sebagai proksi, `evaluate_dataset_images.py --compare-adaptive` mengambil 100 gambar `active` pertama per split sebagai "baseline kalibrasi" — namun ini adalah rata-rata wajah banyak orang berbeda, bukan baseline satu individu.
@@ -87,4 +102,4 @@ Hasil (n=300 gambar/kelas per split, dari `evaluate_dataset_images.py datasets/t
 
 ## 5.4 Pembahasan
 
-> §5.2.1–§5.2.3 selesai (lihat `NASKAH_TA_LENGKAP.md` §5.4 untuk pembahasan lengkap, termasuk perbandingan dengan 15 jurnal di `BAB2.md` — jurnal 1 dan 3 metodologi paling mirip, jurnal 3's akurasi 95,1% sebagai acuan utama; jurnal 8's FPS 10 RPi4 sebagai acuan performa §5.2.3). §5.2.4 (grafik tren) masih menunggu skrip plotting.
+> §5.2.1–§5.2.5 selesai (lihat `NASKAH_TA_LENGKAP.md` §5.4 untuk pembahasan lengkap, termasuk perbandingan dengan 15 jurnal di `BAB2.md` — jurnal 1 dan 3 metodologi paling mirip, jurnal 3's akurasi 95,1% sebagai acuan utama; jurnal 8's FPS 10 RPi4 sebagai acuan performa §5.2.3).
